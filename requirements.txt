@@ -2,5 +2,6 @@ aiogram==3.*
 python-dotenv
 httpx
 aiosqlite
+google-genai>=1.18
 pytest
 pytest-asyncio
