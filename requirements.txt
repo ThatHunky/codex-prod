@@ -2,3 +2,5 @@ aiogram==3.*
 python-dotenv
 httpx
 aiosqlite
+pytest
+pytest-asyncio

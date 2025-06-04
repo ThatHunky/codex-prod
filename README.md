@@ -1,10 +1,11 @@
 # Gemini Telegram Bot
 
-This project demonstrates a simple Telegram bot built with [aiogram](https://github.com/aiogram/aiogram) and the Gemini API. The bot replies to `/start` and forwards any other text to the Gemini API.
+This project bridges Telegram messages to the [aiogram](https://github.com/aiogram/aiogram) framework and the Gemini API.
+The bot replies to `/start` and forwards any other text to Gemini for quick AI-generated responses.
 Conversation history is stored per user in a small SQLite database so the model can maintain context across messages.
 
 
-It calls the **Gemini 2.0 Flash** model for fast responses.
+It uses the **Gemini 2.0 Flash** model for fast responses.
 
 
 
@@ -33,4 +34,21 @@ A simple `Dockerfile` is provided for containerized deployments. Build and run u
 ```bash
 docker build -t gemini-bot .
 docker run --env-file .env gemini-bot
+```
+
+### docker-compose
+
+A sample `docker-compose.yml` is available for local development. Start the bot with:
+
+```bash
+docker compose up --build
+```
+
+## Development
+
+Run linters and tests with:
+
+```bash
+ruff check .
+pytest -q
 ```

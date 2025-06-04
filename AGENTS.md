@@ -11,7 +11,7 @@ Rules are **rank‑ordered by priority**: if a more specific document (`CONTRIBU
 
 | Key                   | Description                                                                                                                        |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| **Mission**           | *«Replace with one‑sentence project goal»*                                                                                         |
+| **Mission**           | Provide a minimal Gemini-powered Telegram bot for chat interactions. |                                                                   
 | **Primary Languages** | Detected automatically. Use this *fallback preference* when creating new files: **Python > TypeScript > Go > Rust > Java > Shell** |
 | **Execution Model**   | Library modules **preferred** → short‑lived CLIs → long‑running services.                                                          |
 | **Online Components** | Anything that must stay online (bot, API, worker) **MUST** ship with a minimal **Docker/OCI** spec.                                |
