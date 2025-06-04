@@ -5,6 +5,11 @@ import os
 from aiogram import Bot, Dispatcher
 from dotenv import load_dotenv
 
+try:
+    from bot.memory import init_db
+except ImportError:  # pragma: no cover - fallback for `python bot/main.py`
+    from memory import init_db
+
 
 # Allow running the script directly or as a module
 try:
@@ -25,6 +30,8 @@ async def main() -> None:
     bot = Bot(token)
     dp = Dispatcher()
     dp.include_router(router)
+
+    await init_db()
 
     await dp.start_polling(bot)
 

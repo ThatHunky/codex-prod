@@ -1,6 +1,7 @@
 # Gemini Telegram Bot
 
 This project demonstrates a simple Telegram bot built with [aiogram](https://github.com/aiogram/aiogram) and the Gemini API. The bot replies to `/start` and forwards any other text to the Gemini API.
+Conversation history is stored per user in a small SQLite database so the model can maintain context across messages.
 
 
 It calls the **Gemini 2.0 Flash** model for fast responses.
