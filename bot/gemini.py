@@ -1,8 +1,8 @@
-import base64
 import os
 from typing import Any, Iterable
 
 import httpx
+from google import genai
 
 
 # Endpoints for the Gemini API
@@ -11,7 +11,7 @@ import httpx
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent"
 
 # Image generation model
-GEMINI_IMAGE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent"
+GENAI_IMAGE_MODEL = "imagen-3.0-generate-002"
 
 
 async def generate_response(
@@ -54,26 +54,21 @@ async def generate_image(prompt: str) -> bytes:
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY is not set")
 
-    params = {"key": api_key}
-    payload: dict[str, Any] = {
-        "contents": [{"role": "user", "parts": [{"text": prompt}]}]
-    }
+    client = genai.Client(api_key=api_key)
 
-    async with httpx.AsyncClient(timeout=30) as client:
-        try:
-            response = await client.post(GEMINI_IMAGE_URL, params=params, json=payload)
-            response.raise_for_status()
-        except Exception as e:  # broad exception to simplify example
-            raise RuntimeError(f"Error contacting Gemini API: {e}") from e
-
-        data = response.json()
-        b64 = (
-            data.get("candidates", [{}])[0]
-            .get("content", {})
-            .get("parts", [{}])[0]
-            .get("inlineData", {})
-            .get("data")
+    try:
+        response = await client.aio.models.generate_images(
+            model=GENAI_IMAGE_MODEL,
+            prompt=prompt,
         )
-        if not b64:
-            raise RuntimeError("Empty image response from Gemini")
-        return base64.b64decode(b64)
+    except Exception as e:  # broad exception to simplify example
+        raise RuntimeError(f"Error contacting Gemini API: {e}") from e
+
+    if not response or not response.generated_images:
+        raise RuntimeError("Empty image response from Gemini")
+
+    img = response.generated_images[0].image
+    if not img or not img.image_bytes:
+        raise RuntimeError("Empty image data from Gemini")
+
+    return img.image_bytes

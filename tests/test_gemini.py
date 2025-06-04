@@ -2,9 +2,9 @@ import sys
 import pathlib
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-import base64
 import os
 import httpx
+from types import SimpleNamespace
 import pytest
 
 from bot import gemini
@@ -35,17 +35,25 @@ class FakeAsyncClient:
         return FakeResponse({"candidates": [{"content": {"parts": [{"text": "hi"}]}}]})
 
 
-class FakeAsyncClientImage(FakeAsyncClient):
-    async def post(self, *args, **kwargs):
-        data = base64.b64encode(b"img").decode()
-        return FakeResponse(
-            {"candidates": [{"content": {"parts": [{"inlineData": {"data": data}}]}}]}
-        )
+class FakeImageClient:
+    class Aio:
+        class Models:
+            async def generate_images(self, *, model: str, prompt: str):
+                img = SimpleNamespace(image_bytes=b"img")
+                return SimpleNamespace(generated_images=[SimpleNamespace(image=img)])
+
+        def __init__(self) -> None:
+            self.models = self.Models()
+
+    def __init__(self, *args, **kwargs) -> None:
+        self.aio = self.Aio()
 
 
-class FakeAsyncClientImageError(FakeAsyncClient):
-    async def post(self, *args, **kwargs):
-        raise httpx.HTTPStatusError("Bad Request", request=None, response=None)
+class FakeImageClientError(FakeImageClient):
+    class Aio(FakeImageClient.Aio):
+        class Models(FakeImageClient.Aio.Models):
+            async def generate_images(self, *, model: str, prompt: str):
+                raise httpx.HTTPStatusError("Bad Request", request=None, response=None)
 
 
 @pytest.mark.asyncio
@@ -58,7 +66,7 @@ async def test_generate_response(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_generate_image(monkeypatch):
-    monkeypatch.setattr(gemini.httpx, "AsyncClient", FakeAsyncClientImage)
+    monkeypatch.setattr(gemini.genai, "Client", FakeImageClient)
     os.environ["GEMINI_API_KEY"] = "x"
     result = await gemini.generate_image("cat")
     assert result == b"img"
@@ -66,7 +74,7 @@ async def test_generate_image(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_generate_image_error(monkeypatch):
-    monkeypatch.setattr(gemini.httpx, "AsyncClient", FakeAsyncClientImageError)
+    monkeypatch.setattr(gemini.genai, "Client", FakeImageClientError)
     os.environ["GEMINI_API_KEY"] = "x"
     with pytest.raises(RuntimeError):
         await gemini.generate_image("cat")
