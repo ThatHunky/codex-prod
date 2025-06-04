@@ -3,9 +3,13 @@ from typing import Any
 
 import httpx
 
+
+# Endpoint for the Gemini API
+
 GEMINI_API_URL = (
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
 )
+
 
 
 async def generate_response(prompt: str) -> str:
