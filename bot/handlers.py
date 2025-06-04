@@ -43,7 +43,12 @@ async def image_handler(message: types.Message) -> None:
     if len(args) < 2:
         await message.answer("Usage: /image <prompt>")
         return
-    img_data = await generate_image(args[1])
+    try:
+        img_data = await generate_image(args[1])
+    except RuntimeError as e:
+        await message.answer(str(e))
+        return
+
     await message.answer_photo(types.BufferedInputFile(img_data, "image.png"))
 
 

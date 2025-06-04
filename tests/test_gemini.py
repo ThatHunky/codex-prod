@@ -4,6 +4,7 @@ import pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import base64
 import os
+import httpx
 import pytest
 
 from bot import gemini
@@ -42,6 +43,11 @@ class FakeAsyncClientImage(FakeAsyncClient):
         )
 
 
+class FakeAsyncClientImageError(FakeAsyncClient):
+    async def post(self, *args, **kwargs):
+        raise httpx.HTTPStatusError("Bad Request", request=None, response=None)
+
+
 @pytest.mark.asyncio
 async def test_generate_response(monkeypatch):
     monkeypatch.setattr(gemini.httpx, "AsyncClient", FakeAsyncClient)
@@ -56,3 +62,11 @@ async def test_generate_image(monkeypatch):
     os.environ["GEMINI_API_KEY"] = "x"
     result = await gemini.generate_image("cat")
     assert result == b"img"
+
+
+@pytest.mark.asyncio
+async def test_generate_image_error(monkeypatch):
+    monkeypatch.setattr(gemini.httpx, "AsyncClient", FakeAsyncClientImageError)
+    os.environ["GEMINI_API_KEY"] = "x"
+    with pytest.raises(RuntimeError):
+        await gemini.generate_image("cat")
