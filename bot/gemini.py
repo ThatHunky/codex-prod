@@ -63,16 +63,17 @@ async def generate_image(prompt: str) -> bytes:
         try:
             response = await client.post(GEMINI_IMAGE_URL, params=params, json=payload)
             response.raise_for_status()
-            data = response.json()
-            b64 = (
-                data.get("candidates", [{}])[0]
-                .get("content", {})
-                .get("parts", [{}])[0]
-                .get("inlineData", {})
-                .get("data")
-            )
-            if not b64:
-                raise ValueError("Empty image response from Gemini")
-            return base64.b64decode(b64)
         except Exception as e:  # broad exception to simplify example
-            return f"Error contacting Gemini API: {e}".encode()
+            raise RuntimeError(f"Error contacting Gemini API: {e}") from e
+
+        data = response.json()
+        b64 = (
+            data.get("candidates", [{}])[0]
+            .get("content", {})
+            .get("parts", [{}])[0]
+            .get("inlineData", {})
+            .get("data")
+        )
+        if not b64:
+            raise RuntimeError("Empty image response from Gemini")
+        return base64.b64decode(b64)
