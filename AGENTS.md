@@ -138,9 +138,9 @@ jobs:
 
 | Role             | GitHub Handle  | Responsibility                |
 | ---------------- | -------------- | ----------------------------- |
-| Lead Maintainer  | *@your‑handle* | Final code‑review, CI/CD keys |
-| Security Contact | *@sec‑handle*  | Vulnerability triage          |
-| Release Engineer | *@rel‑handle*  | Tagging & Changelog           |
+| Lead Maintainer  | *@ThatHunky* | Final code‑review, CI/CD keys |
+| Security Contact | *@ThatHunky*  | Vulnerability triage          |
+| Release Engineer | *@ThatHunky*  | Tagging & Changelog           |
 
 If an agent encounters ambiguity or conflicting directives, \*\*open an issue with the label \*\***`agent‑clarification`** and tag the relevant maintainer.
 
