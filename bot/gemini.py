@@ -6,9 +6,8 @@ import httpx
 
 # Endpoint for the Gemini API
 
-# Use the Gemini Flash 2.5 preview model
-GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-preview-05-20:generateContent"
-
+# Use the Gemini 2.0 Flash model
+GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent"
 
 
 async def generate_response(prompt: str) -> str:
