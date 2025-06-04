@@ -1,5 +1,5 @@
 import os
-from typing import Any
+from typing import Any, Iterable
 
 import httpx
 
@@ -10,18 +10,20 @@ import httpx
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent"
 
 
-async def generate_response(prompt: str) -> str:
-    """Call Gemini API to generate a response for the given prompt."""
+async def generate_response(
+    prompt: str, history: Iterable[tuple[str, str]] | None = None
+) -> str:
+    """Call Gemini API to generate a response including prior history."""
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY is not set")
 
     params = {"key": api_key}
-    # fmt: off
-    payload: dict[str, Any] = {
-        "contents": [{"parts": [{"text": prompt}]}]
-    }
-    # fmt: on
+    contents = [
+        {"role": role, "parts": [{"text": text}]} for role, text in (history or [])
+    ]
+    contents.append({"role": "user", "parts": [{"text": prompt}]})
+    payload: dict[str, Any] = {"contents": contents}
 
     async with httpx.AsyncClient(timeout=30) as client:
         try:
