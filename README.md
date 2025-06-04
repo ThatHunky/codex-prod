@@ -5,7 +5,13 @@ The bot replies to `/start` and forwards any other text to Gemini for quick AI-g
 Conversation history is stored per user in a small SQLite database so the model can maintain context across messages.
 
 
-It uses the **Gemini 2.0 Flash** model for fast responses.
+It uses the free **Gemini 2.5 Flash Preview 05-20** model for text replies and
+**Gemini 2.0 Flash Preview Image Generation** for the `/image` command.
+
+### New commands
+
+* `/new_chat` – reset your conversation history.
+* `/image <prompt>` – generate an image with Gemini.
 
 
 
