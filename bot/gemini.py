@@ -5,10 +5,8 @@ import httpx
 
 
 # Endpoint for the Gemini API
-# Use the latest Flash model as recommended by the Gemini docs
-GEMINI_API_URL = (
-    "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent"
-)
+# Use the latest Gemini Flash 2.5 model
+GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-latest:generateContent"
 
 
 async def generate_response(prompt: str) -> str:
@@ -18,9 +16,11 @@ async def generate_response(prompt: str) -> str:
         raise RuntimeError("GEMINI_API_KEY is not set")
 
     params = {"key": api_key}
+    # fmt: off
     payload: dict[str, Any] = {
         "contents": [{"parts": [{"text": prompt}]}]
     }
+    # fmt: on
 
     async with httpx.AsyncClient(timeout=30) as client:
         try:
@@ -39,4 +39,3 @@ async def generate_response(prompt: str) -> str:
         except Exception as e:  # broad exception to simplify example
             # In production, log exception details
             return f"Error contacting Gemini API: {e}"
-

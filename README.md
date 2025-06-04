@@ -2,7 +2,7 @@
 
 This project demonstrates a simple Telegram bot built with [aiogram](https://github.com/aiogram/aiogram) and the Gemini API. The bot replies to `/start` and forwards any other text to the Gemini API.
 
-It calls the **Gemini 1.5 Flash** model for fast responses.
+It calls the **Gemini 2.5 Flash** model for fast responses.
 
 
 ## Running locally
