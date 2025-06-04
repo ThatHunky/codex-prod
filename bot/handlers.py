@@ -1,5 +1,5 @@
 from aiogram import Router, types
-from aiogram.filters import CommandStart
+from aiogram.filters import Command, CommandStart
 
 
 try:
@@ -11,9 +11,9 @@ except ImportError:  # pragma: no cover - fallback for `python bot/main.py`
 # Import relative to package when run with `python -m bot.main`
 
 try:
-    from bot.gemini import generate_response
+    from bot.gemini import generate_image, generate_response
 except ImportError:  # pragma: no cover - fallback for `python bot/main.py`
-    from gemini import generate_response
+    from gemini import generate_image, generate_response
 
 
 router = Router()
@@ -24,6 +24,27 @@ async def start_handler(message: types.Message) -> None:
     if message.from_user:
         await clear_history(message.from_user.id)
     await message.answer("Welcome to the Gemini bot!")
+
+
+@router.message(Command("new_chat"))
+async def new_chat_handler(message: types.Message) -> None:
+    """Clear the user's chat history."""
+    if message.from_user:
+        await clear_history(message.from_user.id)
+    await message.answer("Started a new chat.")
+
+
+@router.message(Command("image"))
+async def image_handler(message: types.Message) -> None:
+    """Generate an image from the provided prompt."""
+    if not message.text:
+        return
+    args = message.text.split(maxsplit=1)
+    if len(args) < 2:
+        await message.answer("Usage: /image <prompt>")
+        return
+    img_data = await generate_image(args[1])
+    await message.answer_photo(types.BufferedInputFile(img_data, "image.png"))
 
 
 @router.message()

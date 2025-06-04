@@ -1,10 +1,10 @@
-FROM python:3.11-slim AS base
+FROM python:3.12-slim AS base
 WORKDIR /app
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
-FROM python:3.11-slim AS final
+FROM python:3.12-slim AS final
 WORKDIR /app
 COPY --from=base /install /usr/local
 COPY . .
