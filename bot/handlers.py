@@ -1,11 +1,12 @@
 from aiogram import Router, types
 from aiogram.filters import CommandStart
 
-# Import relative to package when run with `python -m bot.main`
+
 try:
     from bot.gemini import generate_response
 except ImportError:  # pragma: no cover - fallback for `python bot/main.py`
     from gemini import generate_response
+
 
 router = Router()
 
