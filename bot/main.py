@@ -14,7 +14,6 @@ except ImportError:  # pragma: no cover - fallback for `python bot/main.py`
     from handlers import router
 
 
-
 async def main() -> None:
     load_dotenv()
     token = os.getenv("TELEGRAM_TOKEN")
@@ -35,4 +34,3 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         pass
-

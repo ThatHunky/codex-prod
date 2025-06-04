@@ -10,8 +10,6 @@ except ImportError:  # pragma: no cover - fallback for `python bot/main.py`
     from gemini import generate_response
 
 
-
-
 router = Router()
 
 
@@ -26,4 +24,3 @@ async def echo_with_gemini(message: types.Message) -> None:
         return
     response = await generate_response(message.text)
     await message.answer(response)
-
