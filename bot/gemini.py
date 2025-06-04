@@ -3,11 +3,13 @@ from typing import Any
 
 import httpx
 
+
 # Endpoint for the Gemini API
 # Use the latest Flash model as recommended by the Gemini docs
 GEMINI_API_URL = (
     "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent"
 )
+
 
 async def generate_response(prompt: str) -> str:
     """Call Gemini API to generate a response for the given prompt."""

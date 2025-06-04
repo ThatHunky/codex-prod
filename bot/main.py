@@ -5,12 +5,14 @@ import os
 from aiogram import Bot, Dispatcher
 from dotenv import load_dotenv
 
+
 # Allow running the script directly or as a module
 try:
     # When executed with `python -m bot.main` or in Docker
     from bot.handlers import router
 except ImportError:  # pragma: no cover - fallback for `python bot/main.py`
     from handlers import router
+
 
 
 async def main() -> None:
