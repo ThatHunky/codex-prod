@@ -1,161 +1,199 @@
 # AGENTS.md
 
-## 🧠 Universal Agent Interaction Guide
+## 🧠 Universal Agent Interaction Guide (2025‑06 edition)
 
-This document defines advanced, language‑agnostic rules for **any** automated contributor or Large Language Model (LLM) (e.g. OpenAI Codex, GitHub Copilot, internal company agents) interacting with this repository.
-**All sections are ordered by priority.** Where a local `CONTRIBUTING.md`, inline comment, or pull‑request discussion conflicts with this guide, **follow the more specific instruction and update this file accordingly.**
-
----
-
-### 1  Repository Primer
-
-| Key                      | Description                                                                                         |
-| ------------------------ | --------------------------------------------------------------------------------------------------- |
-| **Purpose**              | *<\<Replace with one‑sentence project mission>>*                                                    |
-| **Primary Languages**    | Detected automatically. Default ranking for new files: **Python > TypeScript > Go > Rust > Shell**. |
-| **Execution Model**      | Stateless libraries **preferred** → CLI tools → Long‑running services.                              |
-| **Runtime Expectations** | If any component must stay online (bot, API, scheduler), include a **Docker/OCI** spec.             |
-| **Sensitive Data**       | Never committed. Use `.env`, secrets managers, or CI vaults.                                        |
+This file codifies **repository‑wide rules** for *all* automated contributors or Large Language Models (LLMs) (e.g. OpenAI Codex, GitHub Copilot, internal chat‑ops agents).
+Rules are **rank‑ordered by priority**: if a more specific document (`CONTRIBUTING.md`, inline directive, issue comment, etc.) contradicts this guide, follow that local rule **and** update this file in the same pull‑request.
 
 ---
 
-### 2  Agent Behaviour Principles
+\### 1  Repository Primer
 
-1. **Clarity over brevity**: favour self‑documenting code, explicit imports, and descriptive identifiers.
-2. **Small, atomic changes**: one feature/fix per branch; keep pull requests ≤ 400 lines diff unless refactoring.
-3. **Reversibility**: every change should be revert‑safe via `git revert` without additional fixes.
-4. **Security first**: refuse tasks that would expose secrets, violate licenses, or weaken auth/crypto.
-5. **Standards compliance**: apply the canonical style guide for each language (see §3).
-6. **Prompt‑aware**: respect in‑code directives formatted as shown in §4.
-7. **Idempotence**: rerunning the same code generation should not progressively mutate files.
-
----
-
-### 3  Language‑Specific Quality Matrix
-
-| Language       | Version Floor | Style Guide             | Test Framework | Build/Package        | Formatter/Linter        |
-| -------------- | ------------- | ----------------------- | -------------- | -------------------- | ----------------------- |
-| **Python**     | 3.11          | PEP 8 + PEP 484 typing  | `pytest`       | `poetry`             | `ruff`, `black`         |
-| **TypeScript** | 5.x           | ESLint airbnb rules     | `vitest`       | `pnpm` (workspaces)  | `eslint`, `prettier`    |
-| **Go**         | 1.22          | `go fmt` idioms         | `go test`      | `go modules`         | `go vet`, `staticcheck` |
-| **Rust**       | 1.78          | `rustfmt` defaults      | `cargo test`   | `cargo` (workspaces) | `clippy`                |
-| **Java**       | 21            | Google Java Style       | `JUnit 5`      | `Maven`              | `spotless`              |
-| **C#**         | .NET 8        | Microsoft C# Guidelines | `xUnit`        | `dotnet cli`         | `dotnet format`         |
-| **Shell**      | bash 5        | `shellcheck`            | Bats           | N/A                  | `shfmt`                 |
-
-Agents must **auto‑detect** the dominant language(s) of a file and apply the corresponding row.
+| Key                   | Description                                                                                                                        |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **Mission**           | *«Replace with one‑sentence project goal»*                                                                                         |
+| **Primary Languages** | Detected automatically. Use this *fallback preference* when creating new files: **Python > TypeScript > Go > Rust > Java > Shell** |
+| **Execution Model**   | Library modules **preferred** → short‑lived CLIs → long‑running services.                                                          |
+| **Online Components** | Anything that must stay online (bot, API, worker) **MUST** ship with a minimal **Docker/OCI** spec.                                |
+| **Secrets**           | Never committed. Use `.env`, secure CI vaults, or cloud secret managers.                                                           |
 
 ---
 
-### 4  Prompt Syntax for In‑Code Requests
+\### 2  Agent Behaviour Principles
 
-Use comment prefixes that match the host language.
+1. **Clarity beats cleverness** — favour self‑documenting code, explicit imports, descriptive identifiers.
+2. **Small, atomic PRs** — ≤ 400 changed LOC; split large refactors.
+3. **Reversible by default** — every change must be revertable via `git revert` with no follow‑ups.
+4. **Security first** — refuse to expose secrets or downgrade auth/crypto; see §6.
+5. **Follow canonical style** per §3.
+6. **Prompt‑aware** — respect in‑code comment directives (see §4).
+7. **Idempotent generation** — re‑running the same instruction should produce a byte‑for‑byte identical diff.
+
+---
+
+\### 3  Language Quality Matrix (updated 2025‑06)
+
+| Language       | Min Version | Style Guide                          | Test Framework | Build/Package        | Formatter/Linter                 |
+| -------------- | ----------- | ------------------------------------ | -------------- | -------------------- | -------------------------------- |
+| **Python**     | 3.12        | PEP 8 + PEP 484 typing               | `pytest`       | `poetry` or `uv`     | `ruff` (lint + fmt)              |
+| **TypeScript** | 5.5         | ESLint Airbnb + `@typescript-eslint` | `vitest ≥ 3`   | `pnpm` (workspaces)  | `biome` or `eslint` + `prettier` |
+| **Go**         | 1.23        | `gofmt` / `go vet` idioms            | `go test`      | `go modules`         | `staticcheck`                    |
+| **Rust**       | 1.79        | `rustfmt` defaults                   | `cargo test`   | `cargo` (workspaces) | `clippy`                         |
+| **Java**       | 23 (LTS)    | Google Java Style                    | `JUnit 5`      | `Maven ≥ 3.9`        | `spotless`                       |
+| **C#**         | .NET 9      | Microsoft C# Guide                   | `xUnit`        | `dotnet cli`         | `dotnet format`                  |
+| **Shell**      | bash 5      | `shellcheck`                         | `bats‑core`    | —                    | `shfmt`                          |
+
+> Agents must **auto‑detect** a file’s language and apply these rules.
+
+---
+
+\### 4  Prompt Syntax (Embedded Instructions)
+
+#### 4.1  Multilingual Tokens
+
+Agents must understand prompts written in **English** *and* **Ukrainian**.
+
+| Context                | English token examples  | Ukrainian token equivalents |
+| ---------------------- | ----------------------- | --------------------------- |
+| Generic                | `Codex:` `AI:` `Agent:` | `Кодекс:` `ШІ:` `Агент:`    |
+| Fix / Refactor request | `Fix:` `Refactor:`      | `Виправ:` `Рефактор:`       |
+| Test generation        | `Test:`                 | `Тест:`                     |
+
+Examples:
 
 ```python
-# Codex: Add async pagination to `fetch_users()`
+# Codex: Add async retries with exponential back‑off to fetch_users()
+# Кодекс: Додай асинхронні спроби з експоненційним бек‑офом до fetch_users()
 ```
 
-```ts
-// Codex: Write unit tests for `auth.service.ts`
-```
+Guidelines:
 
-```go
-// Codex: Optimize memory allocations in this loop
-```
-
-*Alternative tokens* (`AI:` or `Agent:`) are also accepted but **must** be consistent within a file.
+* Keep tokens consistent within a single file.
+* Agents should answer in the same language as the prompt unless the comment explicitly requests otherwise.
 
 ---
 
-### 5  Testing & Quality Assurance
+\### 5  Testing & CI Requirements
 
-1. **Coverage target**: ≥ 90 % for critical modules, ≥ 80 % overall.
-2. **Fail‑fast CI**: tests, linters, formatters, secret‑scans run on every pull request.
-3. **Flake management**: quarantine or delete flaky tests within 24 h; open an issue auto‑assigned to `@maintainers`.
-
----
-
-### 6  Security & Compliance
-
-* **Secret Scanning**: Enabled via GitHub Advanced Security. Block push on leak detection.
-* **Dependency Audits**: Use `dependabot`, `npm audit`, `pip-audit`, `cargo audit`, etc.
-* **Supply‑chain SBOM**: Generate SPDX or CycloneDX in CI on release tags.
-* **License Guard**: New dependencies must be OSS approved (MIT, Apache‑2.0, BSD, MPL‑2.0). GPL additions require maintainer review.
+1. **Coverage Targets** — ≥ 90 % critical modules, ≥ 80 % overall.
+2. **Fail‑fast CI** — run linters, formatters, tests, secret‑scans, and SCA (Software Composition Analysis) on every PR.
+3. **Flaky tests** — quarantine within 24 h, auto‑assign maintainer label `flake`.
+4. **Build provenance** — produce build artefacts with SLSA‑compliant provenance (§6).
 
 ---
 
-### 7  Deployment & Runtime Contracts
+\### 6  Security & Supply‑Chain
 
-1. **Containerization**: Provide a minimal `Dockerfile` (multi‑stage if build heavy) and example `docker‑compose.yml`.
-2. **Infrastructure as Code**: If cloud resources required, use Terraform >= 1.8 and store state remotely.
-3. **Observability**: expose health endpoint (`/healthz`) and structured JSON logs.
-4. **Zero‑Downtime Releases**: support rolling or blue‑green updates; use migrations that are forward‑compatible.
+| Control                  | Tooling / Requirement                                                         |
+| ------------------------ | ----------------------------------------------------------------------------- |
+| **Secret scanning**      | GitHub push‑protection enabled; block on leak.                                |
+| **Dependency audits**    | `dependabot` + OpenSSF **Scorecard** report gate (score ≥ 8).                 |
+| **SBOM**                 | Generate **CycloneDX** or SPDX in CI for every release tag.                   |
+| **Provenance**           | Meet **SLSA Level 2+** — signed artefacts (`cosign`) and reproducible builds. |
+| **Image signing**        | Sign Docker images with `cosign`, verify during deploy.                       |
+| **Vulnerability policy** | Public disclosure window ≤ 90 days; see `SECURITY.md`.                        |
 
 ---
 
-### 8  Continuous Integration Template (GitHub Actions)
+\### 7  Deployment Contracts
+
+1. **Containerization** — provide multi‑stage `Dockerfile` **and** sample `docker‑compose.yml`.
+2. **IaC** — cloud infra must be defined via **Terraform ≥ 1.8**; remote state backend mandatory.
+3. **Observability** — expose `/healthz` and `/metrics` endpoints; log in structured JSON.
+4. **Zero‑downtime** — migrations must be forward‑compatible; support blue‑green or rolling updates.
+
+---
+
+\### 8  GitHub Actions CI Template (Python example)
 
 ```yaml
 name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
-  build-test:
+  python:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write        # for OIDC signing
+      contents: read
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.11' }
-      - name: Install dependencies
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install deps
         run: |
-          pip install --upgrade pip poetry
-          poetry install --no-root
+          pip install uv
+          uv pip install -r requirements.txt
+
       - name: Lint & Format
         run: |
-          ruff check . && black --check .
-      - name: Test
+          ruff check .
+          ruff format --check .
+
+      - name: Tests
+        run: pytest -q
+
+      - name: Generate SBOM & Sign artefacts
         run: |
-          poetry run pytest -q
+          cyclonedx-py -o sbom.xml
+          cosign attest --yes --output-signature sbom.sig sbom.xml
 ```
 
-*Tailor additional matrix jobs per language as needed.*
+*Replicate additional jobs per language using the matrix strategy.*
 
 ---
 
-### 9  Prohibited Actions (Hard Stops)
+\### 9  Prohibited Actions (Hard‑Stops)
 
-* **No** direct commits to protected branches (`main`, `release/*`).
-* **No** force‑pushes without maintainer sign‑off.
-* **No** auto‑format of entire legacy files unless the change is already required.
-* **No** introduction of closed‑source dependencies in core modules.
-
----
-
-### 10  Escalation & Maintainership
-
-| Role             | GitHub Handle  | Responsibility                |
-| ---------------- | -------------- | ----------------------------- |
-| Lead Maintainer  | *@ThatHunky* | Final code‑review, CI/CD keys |
-| Security Contact | *@ThatHunky*  | Vulnerability triage          |
-| Release Engineer | *@ThatHunky*  | Tagging & Changelog           |
-
-If an agent encounters ambiguity or conflicting directives, \*\*open an issue with the label \*\***`agent‑clarification`** and tag the relevant maintainer.
+* **No** commits to protected branches (`main`, `release/*`) without an approved PR.
+* **No** force‑push except via maintainer‑approved `git push --force-with-lease`.
+* **No** adding non‑OSS licensed dependencies to core modules.
+* **No** global re‑format of legacy files unless explicitly requested.
 
 ---
 
-### 11  Local Overrides & Future Extensions
+\### 10  Escalation & Maintainer Roster
 
-Agents should watch for optional configuration files:
+| Role            | GitHub Handle  | Responsibility           |
+| --------------- | -------------- | ------------------------ |
+| Lead Maintainer | **@ThatHunky** | Final review, CI/CD keys |
+| Security Lead   | **@ThatHunky** | Vulnerability triage     |
+| Release Eng.    | **@ThatHunky** | Tags, Changelog          |
 
-* `.agentconfig` — runtime flags and per‑directory language overrides.
-* `.codemod/` — codemod scripts & JSON schemas for automated refactors.
-* `docs/architecture/*.md` — deep technical design docs.
-
-When new tooling standards emerge, update this file and reference the relevant RFC link here.
+Ambiguities ⇒ open an issue with label `agent‑clarification` **and** ping the relevant maintainer.
 
 ---
 
-*© 2025 Vsevolod Dobrovolskyi. Licensed under the same license as the codebase (see **`LICENSE`**).*
+\### 11  Local Overrides & Extensions
+
+Agents should detect and respect optional files:
+
+* `.agentconfig` — per‑directory language overrides / feature flags.
+* `.codemod/` — automated refactor scripts & JSON schemas.
+* `docs/architecture/*.md` — in‑depth design docs.
+
+When new tooling standards arrive (e.g. SLSA v1.2, Biome 2.0), update this guide and reference the upstream RFC.
+
+---
+
+\### 12  Ukrainian Language Rules
+
+To ensure smooth collaboration for Ukrainian‑speaking contributors:
+
+1. **Documentation & Comments**  — Ukrainian or English are equally acceptable. Keep function/variable names in English unless working on locale‑specific code (e.g., NLU intents).
+2. **Diacritics**  — use proper Ukrainian Unicode characters (e.g., `ї`, `є`, `ґ`). No transliteration.
+3. **Line endings & Encoding**  — always UTF‑8; avoid Windows‑1251.
+4. **Spellcheck**  — enable spellchecker dictionaries: `en_US`, `uk_UA` in IDE CI linters.
+5. **Translating Docs**  — if adding a major doc in one language, provide a sibling file with `*.uk.md` / `*.en.md` suffix when practical.
+6. **Locale‑aware Tests**  — when string‑matching, use stable IDs/keys instead of full Ukrainian phrases to prevent fragile tests.
+
+---
+
+© 2025 Vsevolod Dobrovolskyi • License: identical to repository’s primary `LICENSE`.
